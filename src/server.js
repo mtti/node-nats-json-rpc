@@ -25,11 +25,11 @@ class Server {
   }
 
   handleRequest(request, replyTo) {
-    var isBatch = false;
+    let isBatch = false;
     this.parseRequest(request)
       .then(parsedRequest => this.validateRequest(parsedRequest))
       .then((validRequest) => {
-        var batch;
+        let batch;
         if (Array.isArray(validRequest)) {
           batch = validRequest;
           isBatch = true;
@@ -58,18 +58,14 @@ class Server {
       return Promise.reject(err);
     }
 
-    var requestId = undefined;
+    let requestId;
     if (request.id !== undefined) {
       requestId = request.id;
     }
 
     return this.methods[request.method](request.params)
-      .then((result) => {
-        return Server.createResponse(result, requestId);
-      })
-      .catch((err) => {
-        return Server.createError(err, requestId);
-      });
+      .then(result => Server.createResponse(result, requestId))
+      .catch(err => Server.createError(err, requestId));
   }
 
   parseRequest(request) {
@@ -81,7 +77,6 @@ class Server {
         const newErr = new Error('Parse error');
         newErr.jsonRpcErrorCode = -32700;
         reject(newErr);
-        return;
       }
     });
   }
@@ -91,7 +86,6 @@ class Server {
 
     return new Promise((resolve, reject) => {
       resolve(request);
-      return;
     });
   }
 
@@ -103,7 +97,7 @@ class Server {
       jsonrpc: '2.0',
       error: {
         code: err.jsonRpcErrorCode || 0,
-        message: err.message
+        message: err.message,
       },
       id: requestId,
     };
@@ -115,8 +109,8 @@ class Server {
     }
     return {
       jsonrpc: '2.0',
-      result: result,
-      id: requestId
+      result,
+      id: requestId,
     };
   }
 }

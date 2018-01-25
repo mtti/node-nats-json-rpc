@@ -8,12 +8,12 @@ function createFakeNatsClient() {
 
 describe('Server', () => {
   describe('handleOne()', () => {
-    var request;
-    var natsClient;
-    var methods;
-    var server;
-    var createError;
-    var createResponse;
+    let request;
+    let natsClient;
+    let methods;
+    let server;
+    let createError;
+    let createResponse;
 
     beforeEach(() => {
       request = {
@@ -29,7 +29,7 @@ describe('Server', () => {
         dummyMethod: sinon.stub().resolves('dummy result'),
       };
       server = new Server(natsClient, 'dummyTopic', methods);
-      createError = sandbox.spy(Server, 'createError')
+      createError = sandbox.spy(Server, 'createError');
       createResponse = sandbox.spy(Server, 'createResponse');
     });
 
@@ -44,15 +44,13 @@ describe('Server', () => {
         });
     });
 
-    it('when method resolves', () => {
-      return server.handleOne(request)
-        .then((actual) => {
-          assert(createResponse.called, 'Should call createResponse');
-        })
-        .catch((err) => {
-          assert.fail(err, null, 'Promise should not reject');
-        });
-    });
+    it('when method resolves', () => server.handleOne(request)
+      .then((actual) => {
+        assert(createResponse.called, 'Should call createResponse');
+      })
+      .catch((err) => {
+        assert.fail(err, null, 'Promise should not reject');
+      }));
 
     it('when method rejects', () => {
       methods.dummyMethod = sinon.stub().rejects(new Error('Dummy error'));
@@ -67,8 +65,8 @@ describe('Server', () => {
   });
 
   describe('createError()', () => {
-    var err;
-    var expected;
+    let err;
+    let expected;
 
     beforeEach(() => {
       err = new Error('Dummy error');
