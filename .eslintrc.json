@@ -4,7 +4,9 @@
     "mocha": true
   },
   "globals": {
-    "assert": true
+    "assert": true,
+    "sandbox": true,
+    "sinon": true
   },
   "rules": {
     "import/no-extraneous-dependencies": ["error", {"devDependencies": ["test/**/*.js", "src/**/*.spec.js"]}],

@@ -45,7 +45,7 @@ describe('Server', () => {
     });
 
     it('when method resolves', () => server.handleOne(request)
-      .then((actual) => {
+      .then(() => {
         assert(createResponse.called, 'Should call createResponse');
       })
       .catch((err) => {
@@ -55,7 +55,7 @@ describe('Server', () => {
     it('when method rejects', () => {
       methods.dummyMethod = sinon.stub().rejects(new Error('Dummy error'));
       return server.handleOne(request)
-        .then((result) => {
+        .then(() => {
           assert(createError.called, 'Should call createError');
         })
         .catch((err) => {

@@ -24,10 +24,10 @@ class Server {
     });
   }
 
-  handleRequest(request, replyTo) {
+  handleRequest(rawRequest, replyTo) {
     let isBatch = false;
-    this.parseRequest(request)
-      .then(parsedRequest => this.validateRequest(parsedRequest))
+    Server.parseRequest(rawRequest)
+      .then(parsedRequest => Server.validateRequest(parsedRequest))
       .then((validRequest) => {
         let batch;
         if (Array.isArray(validRequest)) {
@@ -40,14 +40,14 @@ class Server {
       })
       .then(results => results.filter(result => result !== null))
       .then((results) => {
-        if (results.length == 1 && !isBatch) {
+        if (results.length === 1 && !isBatch) {
           this.natsClient.publish(replyTo, JSON.stringify(results[0]));
         } else if (results.length > 0) {
           this.natsClient.publish(replyTo, JSON.stringify(results));
         }
       })
       .catch((err) => {
-        this.natsClient.publish(replyTo, JSON.stringify(createError(err, null)));
+        this.natsClient.publish(replyTo, JSON.stringify(Server.createError(err, null)));
       });
   }
 
@@ -68,7 +68,7 @@ class Server {
       .catch(err => Server.createError(err, requestId));
   }
 
-  parseRequest(request) {
+  static parseRequest(request) {
     return new Promise((resolve, reject) => {
       try {
         const parsedRequest = JSON.parse(request);
@@ -81,10 +81,10 @@ class Server {
     });
   }
 
-  validateRequest(request) {
+  static validateRequest(request) {
     // TODO: validate request schema
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       resolve(request);
     });
   }

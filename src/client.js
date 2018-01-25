@@ -16,7 +16,8 @@ limitations under the License.
 
 class Client {
   constructor(natsClient, topic) {
-
+    this.natslient = natsClient;
+    this.topic = topic;
   }
 }
 
