@@ -1,0 +1,24 @@
+{
+  "name": "node-nats-json-rpc",
+  "private": true,
+  "version": "0.1.0",
+  "description": "JSON-RPC 2.0 over NATS",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
+    "lint:fix": "eslint --fix \"src/**/*.js\" \"test/**/*.js\"",
+    "mocha": "mocha test/setup.js \"src/**/*.spec.js\"",
+    "test": "npm run mocha || npm run lint"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "chai-subset": "1.6.0",
+    "eslint": "4.16.0",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.8.0",
+    "mocha": "5.0.0",
+    "sinon": "4.2.1"
+  },
+  "author": "Matti Hiltunen",
+  "license": "Apache-2.0"
+}
