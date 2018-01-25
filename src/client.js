@@ -14,10 +14,49 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+const nats = require('nats');
+
 class Client {
-  constructor(natsClient, topic) {
-    this.natslient = natsClient;
-    this.topic = topic;
+  constructor(natsClient, subject, options) {
+    let opts = {};
+    if (options) {
+      opts = options;
+    }
+
+    this.options = {
+      defaultTimeout: 1000,
+    };
+    if (opts.defaultTimeout !== undefined) {
+      this.options.defaultTimeout = opts.defaultTimeout;
+    }
+
+    this.natsClient = natsClient;
+    this.subject = subject;
+  }
+
+  request(methodName, params, options) {
+    let opts = {};
+    if (options) {
+      opts = options;
+    }
+    const timeout = opts.timeout || this.options.defaultTimeout;
+
+    const message = {
+      jsonrpc: '2.0',
+      method: methodName,
+      params,
+      id: null,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.natsClient.requestOne(this.subject, JSON.stringify(message), {}, timeout, (response) => {
+        if (response instanceof nats.NatsError) {
+          reject(response);
+          return;
+        }
+        resolve(response);
+      });
+    });
   }
 }
 

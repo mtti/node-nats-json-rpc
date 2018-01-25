@@ -14,12 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class Server {
+const EventEmitter = require('events');
+
+class Server extends EventEmitter {
   constructor(natsClient, topic, methods) {
+    super();
+
     this.natsClient = natsClient;
     this.methods = methods;
 
-    natsClient.subscribe(topic, (request, replyTo) => {
+    const options = {
+      queue: 'node-nats-json-rpc',
+    };
+    natsClient.subscribe(topic, options, (request, replyTo) => {
       this.handleRequest(request, replyTo);
     });
   }
@@ -47,7 +54,7 @@ class Server {
         }
       })
       .catch((err) => {
-        this.natsClient.publish(replyTo, JSON.stringify(Server.createError(err, null)));
+        this.natsClient.publish(replyTo, JSON.stringify(this.createError(err, null)));
       });
   }
 
@@ -64,8 +71,8 @@ class Server {
     }
 
     return this.methods[request.method](request.params)
-      .then(result => Server.createResponse(result, requestId))
-      .catch(err => Server.createError(err, requestId));
+      .then(result => this.createResponse(result, requestId))
+      .catch(err => this.createError(err, requestId));
   }
 
   static parseRequest(request) {
@@ -89,7 +96,9 @@ class Server {
     });
   }
 
-  static createError(err, requestId) {
+  createError(err, requestId) {
+    this.emit('requestError', err);
+
     if (requestId === undefined) {
       return null;
     }
@@ -103,7 +112,9 @@ class Server {
     };
   }
 
-  static createResponse(result, requestId) {
+  createResponse(result, requestId) {
+    this.emit('requestSuccess', result);
+
     if (requestId === undefined) {
       return null;
     }

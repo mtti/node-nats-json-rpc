@@ -7,11 +7,20 @@ function createFakeNatsClient() {
 }
 
 describe('Server', () => {
+  let natsClient;
+  let methods;
+  let server;
+
+  beforeEach(() => {
+    natsClient = createFakeNatsClient();
+    methods = {
+      dummyMethod: sinon.stub().resolves('dummy result'),
+    };
+    server = new Server(natsClient, 'dummyTopic', methods);
+  });
+
   describe('handleOne()', () => {
     let request;
-    let natsClient;
-    let methods;
-    let server;
     let createError;
     let createResponse;
 
@@ -24,13 +33,8 @@ describe('Server', () => {
         },
         id: null,
       };
-      natsClient = createFakeNatsClient();
-      methods = {
-        dummyMethod: sinon.stub().resolves('dummy result'),
-      };
-      server = new Server(natsClient, 'dummyTopic', methods);
-      createError = sandbox.spy(Server, 'createError');
-      createResponse = sandbox.spy(Server, 'createResponse');
+      createError = sandbox.spy(server, 'createError');
+      createResponse = sandbox.spy(server, 'createResponse');
     });
 
     it('raises error when method is not found', () => {
@@ -82,38 +86,38 @@ describe('Server', () => {
     });
 
     it('returns null when requestId is undefined', () => {
-      const actual = Server.createError(err);
+      const actual = server.createError(err);
       assert.isNull(actual);
     });
 
     it('when requestId is null', () => {
-      const actual = Server.createError(err, null);
+      const actual = server.createError(err, null);
       assert.deepEqual(actual, expected);
     });
 
     it('when requestId is a string', () => {
       expected.id = 'abcd';
-      const actual = Server.createError(err, 'abcd');
+      const actual = server.createError(err, 'abcd');
       assert.deepEqual(actual, expected);
     });
 
     it('when requestId is a number', () => {
       expected.id = 1234;
-      const actual = Server.createError(err, 1234);
+      const actual = server.createError(err, 1234);
       assert.deepEqual(actual, expected);
     });
 
     it('honors jsonRpcErrorCode', () => {
       expected.error.code = 1234;
       err.jsonRpcErrorCode = 1234;
-      const actual = Server.createError(err, null);
+      const actual = server.createError(err, null);
       assert.deepEqual(actual, expected);
     });
   });
 
   describe('createResponse()', () => {
     it('returns null when requestId is undefined', () => {
-      const actual = Server.createResponse('foo');
+      const actual = server.createResponse('foo');
       assert.isNull(actual);
     });
 
@@ -123,7 +127,7 @@ describe('Server', () => {
         result: 'foo',
         id: null,
       };
-      const actual = Server.createResponse('foo', null);
+      const actual = server.createResponse('foo', null);
       assert.deepEqual(actual, expected);
     });
 
@@ -133,7 +137,7 @@ describe('Server', () => {
         result: 'foo',
         id: 'abcdefg',
       };
-      const actual = Server.createResponse('foo', 'abcdefg');
+      const actual = server.createResponse('foo', 'abcdefg');
       assert.deepEqual(actual, expected);
     });
 
@@ -143,7 +147,7 @@ describe('Server', () => {
         result: 'foo',
         id: 1234,
       };
-      const actual = Server.createResponse('foo', 1234);
+      const actual = server.createResponse('foo', 1234);
       assert.deepEqual(actual, expected);
     });
   });
