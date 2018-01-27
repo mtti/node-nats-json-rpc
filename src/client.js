@@ -55,12 +55,14 @@ class Client {
           return;
         }
 
-        if ('error' in response) {
-          reject(new Error(`RPC error: ${response.error.message}`));
+        const parsedResponse = JSON.parse(response);
+
+        if ('error' in parsedResponse) {
+          reject(new Error(`RPC error: ${parsedResponse.error.message}`));
           return;
         }
 
-        resolve(response.result);
+        resolve(parsedResponse.result);
       });
     });
   }

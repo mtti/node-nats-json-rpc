@@ -35,7 +35,7 @@ describe('Client', () => {
     };
 
     natsClient = {
-      requestOne: sinon.stub().callsArgWith(4, okResponse),
+      requestOne: sinon.stub().callsArgWith(4, JSON.stringify(okResponse)),
     };
 
     client = new Client(natsClient, 'dummy-subject');
@@ -65,7 +65,7 @@ describe('Client', () => {
         },
         id: null,
       };
-      natsClient.requestOne = sinon.stub().callsArgWith(4, errorResponse);
+      natsClient.requestOne = sinon.stub().callsArgWith(4, JSON.stringify(errorResponse));
 
       return client.request('dummyMethod', params)
         .then((actual) => {
