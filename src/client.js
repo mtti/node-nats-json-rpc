@@ -54,7 +54,13 @@ class Client {
           reject(response);
           return;
         }
-        resolve(response);
+
+        if ('error' in response) {
+          reject(new Error(`RPC error: ${response.error.message}`));
+          return;
+        }
+
+        resolve(response.result);
       });
     });
   }
