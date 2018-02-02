@@ -1,5 +1,3 @@
-# node-nats-json-rpc
-
 A simple server and client for JSON-RPC 2.0 over NATS on Node.js. Currently in a pre-release stage of development.
 
 ## License
